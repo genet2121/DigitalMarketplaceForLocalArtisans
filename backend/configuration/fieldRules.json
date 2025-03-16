@@ -1,0 +1,207 @@
+{
+    "tables": {
+        "User": {
+            "fields": {
+                "fullName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "required": true
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "unique": true,
+                    "required": true
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 255,
+                    "required": true
+                },
+                "role": {
+                    "type": "enum",
+                    "allowedValues": ["artisan", "customer", "admin"],
+                    "required": true
+                },
+                "phone": {
+                    "type": "string",
+                    "pattern": "^[0-9]+$",
+                    "minLength": 10,
+                    "maxLength": 20,
+                    "required": false
+                },
+                "address": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "required": false
+                }
+            }
+        },
+        "Product": {
+            "fields": {
+                "artisanId": {
+                    "type": "integer",
+                    "minLength": 3,
+                    "maxLength": 255,
+                    "required": true
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 255,
+                    "required": true
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 2000,
+                    "required": false
+                },
+                "price": {
+                    "type": "decimal",
+                    "min": 0.01,
+                    "required": true
+                },
+                "stock": {
+                    "type": "integer",
+                    "min": 0,
+                    "required": true
+                },
+                "category": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "required": false
+                },
+                "imageUrl": {
+                    "type": "string",
+                    "format": "url",
+                    "maxLength": 500,
+                    "required": false
+                }
+            }
+        },
+        "Attachment": {
+            "fields": {
+                "productId": {
+                    "type": "integer",
+                    "required": false
+                },
+               
+                "fileName": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "required": true
+                },
+                "extension": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "required": true
+                },
+                "createdAt": {
+                    "type": "datetime",
+                    "required": true
+                },
+                "updatedAt": {
+                    "type": "datetime",
+                    "required": true
+                }
+            }
+        },
+        "Order": {
+            "fields": {
+                "customerId": {
+                    "type": "integer",
+                    "min": 0,
+                    "required": false
+                },
+                "totalAmount": {
+                    "type": "decimal",
+                    "min": 0,
+                    "required": true
+                },
+                "status": {
+                    "type": "enum",
+                    "allowedValues": ["pending", "confirmed", "shipped", "delivered"],
+                    "required": true
+                }
+            }
+        },
+        "OrderItem": {
+            "fields": {
+                "orderId": {
+                    "type": "integer",
+                 
+                    "required": true
+                },
+                "productId": {
+                    "type": "integer",
+                  
+                    "required": true
+                },
+                "quantity": {
+                    "type": "integer",
+                    "min": 1,
+                    "required": true
+                },
+                "price": {
+                    "type": "decimal",
+                    "min": 0.01,
+                    "required": true
+                }
+            }
+        },
+        "Cart": {
+            "fields": {
+                "customerId": {
+                    "type": "integer",
+                    "required": true
+                },
+                "productId": {
+                    "type": "integer",
+                    "required": true
+                },
+                "quantity": {
+                    "type": "integer",
+                    "min": 1,
+                    "required": true
+                }
+            }
+        },
+        "Notification": {
+            "fields": {
+                "userId": {
+                    "type": "integer",
+                    "required": true
+                },
+                "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500,
+                    "required": true
+                },
+                "isRead": {
+                    "type": "boolean",
+                    "required": false
+                }
+            }
+        },
+        "Choice": {
+            "fields": {
+                "category": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "required": true
+                },
+                "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "required": true
+                }
+            }
+        }
+    }
+}
