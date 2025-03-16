@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  fullName  String  @map("full_name")
+  email     String  @unique
+  password  String
+  role      Role
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  products      Product[]
+  orders        Order[]
+  cart          Cart[]
+  notifications Notification[]
+}
+
+
+
+model Product {
+  id             Int         @id @default(autoincrement())
+  artisanId      Int         @map("artisan_id")
+  attachmentId   Int?        @unique @map("attachment_id")  // ✅ Unique field for primary attachment
+  name           String
+  description    String?
+  price          Decimal     @db.Decimal(10,2)
+  stock          Int         @default(0)
+  category       String?
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  artisan        User        @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+  
+
+  primaryAttachment Attachment? @relation(name: "ProductPrimaryAttachment", fields: [attachmentId], references: [id], onDelete: SetNull)
+
+ 
+  attachments        Attachment[] @relation(name: "ProductAttachments")
+
+  orderItems     OrderItem[]
+  cartItems      Cart[]
+}
+
+model Attachment {
+  id         Int      @id @default(autoincrement())
+  productId  Int?     @map("product_id") 
+
+  table      String
+  fileName   String   @db.VarChar(100) @map("file_name")
+  extension  String   @db.VarChar(10)
+  createdAt  DateTime @default(now()) 
+  updatedAt  DateTime @updatedAt 
+
+
+  primaryForProduct Product? @relation(name: "ProductPrimaryAttachment")
+
+  attachedToProduct Product? @relation(name: "ProductAttachments", fields: [productId], references: [id], onDelete: Cascade)
+}
+
+
+
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  customerId  Int      @map("customer_id")
+  totalAmount Decimal @db.Decimal(10,2)
+  status      OrderStatus @default(pending)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  customer    User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  productId Int      @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(10,2)
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id          Int      @id @default(autoincrement())
+  customerId  Int      @map("customer_id")
+  productId   Int      @map("product_id")
+  quantity    Int      @default(1)
+  addedAt     DateTime @default(now()) @map("added_at")
+
+  customer    User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Choice {
+  id       Int      @id @default(autoincrement())
+  category String  @map("category") // e.g., "Product Category", "Order Status"
+  value    String  @map("value") // e.g., "Handmade", "Shipped", "Delivered"
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+enum Role {
+  artisan
+  customer
+  admin
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  shipped
+  delivered
+}
